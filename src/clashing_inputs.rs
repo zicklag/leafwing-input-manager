@@ -52,20 +52,25 @@ impl UserInput {
     fn clashes(&self, other: &UserInput) -> bool {
         use UserInput::*;
 
-        // TODO: Clash with dpads ( if that even makes sense )
-        match self {
-            Single(self_button) => match other {
-                Single(_) => false,
-                Chord(other_set) => button_chord_clash(self_button, other_set),
-                VirtualDPad { .. } => false,
-            },
-            Chord(self_set) => match other {
-                Single(other_button) => button_chord_clash(other_button, self_set),
-                Chord(other_set) => chord_chord_clash(self_set, other_set),
-                VirtualDPad { .. } => false,
-            },
-            VirtualDPad { .. } => false,
-        }
+        let convert_to_chord = |input: &UserInput| {
+            let mut chord = PetitSet::new();
+            match input {
+                Single(button) => {
+                    chord.insert(*button);
+                }
+                Chord(c) => chord = c.clone(),
+                VirtualDPad(dpad) => {
+                    chord.insert(dpad.up);
+                    chord.insert(dpad.down);
+                    chord.insert(dpad.left);
+                    chord.insert(dpad.right);
+                }
+            };
+            chord
+        };
+        let self_chord = convert_to_chord(self);
+        let other_chord = convert_to_chord(other);
+        chord_chord_clash(&self_chord, &other_chord)
     }
 }
 
@@ -189,16 +194,6 @@ impl<A: Actionlike> Clash<A> {
             _phantom: PhantomData::default(),
         }
     }
-}
-
-/// Does the `button` clash with the `chord`?
-#[must_use]
-fn button_chord_clash(button: &InputKind, chord: &PetitSet<InputKind, 8>) -> bool {
-    if chord.len() <= 1 {
-        return false;
-    }
-
-    chord.contains(button)
 }
 
 /// Does the `chord_a` clash with `chord_b`?
