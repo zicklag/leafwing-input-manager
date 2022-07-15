@@ -8,8 +8,11 @@ use bevy_input::{
 };
 use petitset::PetitSet;
 
-use bevy_ecs::prelude::{Events, Res, ResMut, World};
 use bevy_ecs::system::SystemState;
+use bevy_ecs::{
+    event::Events,
+    prelude::{Res, ResMut, World},
+};
 
 use crate::axislike::{AxisType, DualAxisData, MouseWheelAxisType, SingleAxis, VirtualDPad};
 use crate::buttonlike::MouseWheelDirection;
@@ -20,7 +23,7 @@ use crate::user_input::{InputKind, UserInput};
 /// Each of these streams is optional; if a stream does not exist, it is treated as if it were entirely unpressed.
 ///
 /// These are typically collected via a system from the [`World`](bevy::prelude::World) as resources.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct InputStreams<'a> {
     /// An optional [`GamepadButton`] [`Input`] stream
     pub gamepad_buttons: Option<&'a Input<GamepadButton>>,
@@ -180,10 +183,7 @@ impl<'a> InputStreams<'a> {
                 // If a gamepad was registered, just check that one
                 if let Some(gamepad) = self.associated_gamepad {
                     if let Some(gamepad_buttons) = self.gamepad_buttons {
-                        gamepad_buttons.pressed(GamepadButton {
-                            gamepad,
-                            button_type: gamepad_button,
-                        })
+                        gamepad_buttons.pressed(GamepadButton(gamepad, gamepad_button))
                     } else {
                         false
                     }
@@ -194,10 +194,7 @@ impl<'a> InputStreams<'a> {
                         (self.gamepads, self.gamepad_buttons)
                     {
                         for &gamepad in gamepads.iter() {
-                            if gamepad_buttons.pressed(GamepadButton {
-                                gamepad,
-                                button_type: gamepad_button,
-                            }) {
+                            if gamepad_buttons.pressed(GamepadButton(gamepad, gamepad_button)) {
                                 // Return early if *any* gamepad is pressing this button
                                 return true;
                             }
@@ -312,7 +309,7 @@ impl<'a> InputStreams<'a> {
                         if let Some(axes) = self.gamepad_axes {
                             if let Some(gamepad) = self.associated_gamepad {
                                 let value = axes
-                                    .get(GamepadAxis { gamepad, axis_type })
+                                    .get(GamepadAxis ( gamepad, axis_type ))
                                     .unwrap_or_default();
 
                                 value_in_axis_range(single_axis, value)
@@ -321,10 +318,10 @@ impl<'a> InputStreams<'a> {
                             } else if let Some(gamepads) = self.gamepads {
                                 for &gamepad in gamepads.iter() {
                                     let value = axes
-                                        .get(GamepadAxis {
+                                        .get(GamepadAxis(
                                             gamepad,
-                                            axis_type: single_axis.axis_type.try_into().unwrap(),
-                                        })
+                                            single_axis.axis_type.try_into().unwrap(),
+                                        ))
                                         .unwrap_or_default();
                                     let value = value_in_axis_range(single_axis, value);
 
@@ -379,18 +376,12 @@ impl<'a> InputStreams<'a> {
                     if let Some(gamepad) = self.associated_gamepad {
                         // Get the value from the registered gamepad
                         button_axes
-                            .get(GamepadButton {
-                                gamepad,
-                                button_type: *button_type,
-                            })
+                            .get(GamepadButton(gamepad, *button_type))
                             .unwrap_or_else(use_button_value)
                     } else if let Some(gamepads) = self.gamepads {
                         for &gamepad in gamepads.iter() {
                             let value = button_axes
-                                .get(GamepadButton {
-                                    gamepad,
-                                    button_type: *button_type,
-                                })
+                                .get(GamepadButton(gamepad, *button_type))
                                 .unwrap_or_else(use_button_value);
 
                             if value != 0.0 {
@@ -462,7 +453,6 @@ impl<'a> InputStreams<'a> {
 /// Each of these streams is optional; if a stream does not exist, inputs sent to them will be ignored.
 ///
 /// These are typically collected via a system from the [`World`](bevy::prelude::World) as resources.
-#[derive(Debug)]
 pub struct MutableInputStreams<'a> {
     /// An optional [`GamepadButton`] [`Input`] stream
     pub gamepad_buttons: Option<&'a mut Input<GamepadButton>>,

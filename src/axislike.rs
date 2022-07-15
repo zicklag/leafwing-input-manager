@@ -8,7 +8,7 @@ use bevy_input::{
     keyboard::KeyCode,
 };
 use bevy_math::Vec2;
-use bevy_utils::FloatOrd;
+use bevy_core::FloatOrd;
 use serde::{Deserialize, Serialize};
 
 /// A single directional axis with a configurable trigger zone.

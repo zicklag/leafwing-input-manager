@@ -484,7 +484,9 @@ mod direction {
         /// [`Direction::EAST`] is the default direction,
         /// as it is consistent with the default [`Rotation`]
         fn default() -> Direction {
-            Direction::EAST
+            Direction {
+                unit_vector: Vec2::new(1.0, 0.0)
+            }
         }
     }
 
@@ -515,39 +517,39 @@ mod direction {
 
     // Constants
     impl Direction {
-        /// The direction that points straight up
-        pub const NORTH: Direction = Direction {
-            unit_vector: Vec2::new(0.0, 1.0),
-        };
-        /// The direction that points straight right
-        pub const EAST: Direction = Direction {
-            unit_vector: Vec2::new(1.0, 0.0),
-        };
-        /// The direction that points straight down
-        pub const SOUTH: Direction = Direction {
-            unit_vector: Vec2::new(0.0, -1.0),
-        };
-        /// The direction that points straight left
-        pub const WEST: Direction = Direction {
-            unit_vector: Vec2::new(-1.0, 0.0),
-        };
+        // /// The direction that points straight up
+        // pub const NORTH: Direction = Direction {
+        //     unit_vector: Vec2::new(0.0, 1.0),
+        // };
+        // /// The direction that points straight right
+        // pub const EAST: Direction = Direction {
+        //     unit_vector: Vec2::new(1.0, 0.0),
+        // };
+        // /// The direction that points straight down
+        // pub const SOUTH: Direction = Direction {
+        //     unit_vector: Vec2::new(0.0, -1.0),
+        // };
+        // /// The direction that points straight left
+        // pub const WEST: Direction = Direction {
+        //     unit_vector: Vec2::new(-1.0, 0.0),
+        // };
 
-        /// The direction that points halfway between up and right
-        pub const NORTHEAST: Direction = Direction {
-            unit_vector: Vec2::new(SQRT_2 / 2.0, SQRT_2 / 2.0),
-        };
-        /// The direction that points halfway between down and right
-        pub const SOUTHEAST: Direction = Direction {
-            unit_vector: Vec2::new(SQRT_2 / 2.0, -SQRT_2 / 2.0),
-        };
-        /// The direction that points halfway between down and left
-        pub const SOUTHWEST: Direction = Direction {
-            unit_vector: Vec2::new(-SQRT_2 / 2.0, -SQRT_2 / 2.0),
-        };
-        /// The direction that points halfway between left and up
-        pub const NORTHWEST: Direction = Direction {
-            unit_vector: Vec2::new(-SQRT_2 / 2.0, SQRT_2 / 2.0),
-        };
+        // /// The direction that points halfway between up and right
+        // pub const NORTHEAST: Direction = Direction {
+        //     unit_vector: Vec2::new(SQRT_2 / 2.0, SQRT_2 / 2.0),
+        // };
+        // /// The direction that points halfway between down and right
+        // pub const SOUTHEAST: Direction = Direction {
+        //     unit_vector: Vec2::new(SQRT_2 / 2.0, -SQRT_2 / 2.0),
+        // };
+        // /// The direction that points halfway between down and left
+        // pub const SOUTHWEST: Direction = Direction {
+        //     unit_vector: Vec2::new(-SQRT_2 / 2.0, -SQRT_2 / 2.0),
+        // };
+        // /// The direction that points halfway between left and up
+        // pub const NORTHWEST: Direction = Direction {
+        //     unit_vector: Vec2::new(-SQRT_2 / 2.0, SQRT_2 / 2.0),
+        // };
     }
 
     impl Add for Direction {

@@ -139,10 +139,7 @@ impl<'a> MutableInputStreams<'a> {
         if let Some(ref mut gamepad_input) = self.gamepad_buttons {
             for button_type in gamepad_buttons {
                 if let Some(gamepad) = self.associated_gamepad {
-                    let gamepad_button = GamepadButton {
-                        gamepad,
-                        button_type,
-                    };
+                    let gamepad_button = GamepadButton(gamepad, button_type);
                     gamepad_input.press(gamepad_button);
                 }
             }
@@ -154,8 +151,7 @@ impl<'a> MutableInputStreams<'a> {
                     AxisType::Gamepad(axis_type) => {
                         if let Some(ref mut gamepad_input) = self.gamepad_axes {
                             if let Some(gamepad) = self.associated_gamepad {
-                                gamepad_input
-                                    .set(GamepadAxis { gamepad, axis_type }, position_data);
+                                gamepad_input.set(GamepadAxis(gamepad, axis_type), position_data);
                             }
                         }
                     }
@@ -204,10 +200,7 @@ impl<'a> MutableInputStreams<'a> {
         if let Some(ref mut gamepad_input) = self.gamepad_buttons {
             for button_type in gamepad_buttons {
                 if let Some(gamepad) = self.associated_gamepad {
-                    let gamepad_button = GamepadButton {
-                        gamepad,
-                        button_type,
-                    };
+                    let gamepad_button = GamepadButton(gamepad, button_type);
                     gamepad_input.release(gamepad_button);
                 }
             }
@@ -218,7 +211,7 @@ impl<'a> MutableInputStreams<'a> {
                 AxisType::Gamepad(axis_type) => {
                     if let Some(ref mut gamepad_input) = self.gamepad_axes {
                         if let Some(gamepad) = self.associated_gamepad {
-                            gamepad_input.remove(GamepadAxis { gamepad, axis_type });
+                            gamepad_input.remove(GamepadAxis(gamepad, axis_type));
                         }
                     }
                 }
@@ -412,7 +405,7 @@ mod test {
 
         // BLOCKED: cannot use the less artifical APIs due to
         // https://github.com/bevyengine/bevy/issues/3808
-        let gamepad = Some(Gamepad { id: 0 });
+        let gamepad = Some(Gamepad(0));
 
         // Test that buttons are unpressed by default
         assert!(!world.pressed(KeyCode::Space));
